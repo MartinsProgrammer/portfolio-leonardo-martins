@@ -3,107 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leonardo Martins | Programador</title>
+  <title>Leonardo Martins | Portfólio</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="header">
-  <a href="#" class="logo">LM<span>.</span></a>
+  <a href="#" class="logo">Leonardo Martins</a>
 
   <nav>
     <a href="#sobre">Sobre</a>
-    <a href="#tecnologias">Tecnologias</a>
+    <a href="#skills">Skills</a>
     <a href="#projetos">Projetos</a>
     <a href="#contacto">Contacto</a>
   </nav>
 </header>
 
-<section class="hero">
-  <div class="hero-text">
-    <p class="tag">👋 Olá, eu sou o Leonardo</p>
-    <h1>Programador Web & Mobile</h1>
-    <p class="description">
-      Crio websites, aplicações e sistemas digitais modernos,
-      com foco em design, funcionalidade e problemas reais.
+<main>
+  <section class="hero">
+    <div class="hero-content">
+      <span class="label">Programador Web & Mobile</span>
+
+      <h1>Crio soluções digitais modernas, úteis e bem estruturadas.</h1>
+
+      <p>
+        Desenvolvo websites, aplicações e sistemas de gestão com foco em design,
+        performance e resolução de problemas reais.
+      </p>
+
+      <div class="actions">
+        <a href="#projetos" class="btn primary">Ver projetos</a>
+        <a href="https://github.com/MartinsProgrammer" target="_blank" class="btn outline">GitHub</a>
+      </div>
+    </div>
+
+    <div class="hero-image">
+      <img src="perfil.jpeg" alt="Leonardo Martins">
+    </div>
+  </section>
+
+  <section id="sobre" class="section about">
+    <span class="label">Sobre mim</span>
+    <h2>Sou um programador focado em criar soluções simples, funcionais e com boa apresentação.</h2>
+
+    <p>
+      Tenho experiência em desenvolvimento web e mobile, com projetos práticos como websites
+      institucionais, aplicações com APIs, dashboards e sistemas de gestão. Gosto de trabalhar
+      em projetos que tenham utilidade real e que possam ajudar empresas ou pessoas no dia a dia.
+    </p>
+  </section>
+
+  <section id="skills" class="section">
+    <span class="label">Competências</span>
+    <h2>Tecnologias e ferramentas</h2>
+
+    <div class="skills-grid">
+      <div>HTML</div>
+      <div>CSS</div>
+      <div>JavaScript</div>
+      <div>Node.js</div>
+      <div>Express</div>
+      <div>SQLite</div>
+      <div>Flutter</div>
+      <div>Dart</div>
+      <div>Git</div>
+      <div>GitHub</div>
+    </div>
+  </section>
+
+  <section id="projetos" class="section">
+    <span class="label">Portfólio</span>
+    <h2>Projetos em destaque</h2>
+
+    <div class="projects-grid">
+      <article class="project-card">
+        <span class="project-number">01</span>
+        <h3>DriveGest</h3>
+        <p>Sistema de gestão para escolas de condução, com alunos, estados, dashboard e comunicações.</p>
+        <div class="tech">Node.js · SQLite · JavaScript</div>
+      </article>
+
+      <article class="project-card">
+        <span class="project-number">02</span>
+        <h3>App Proteção Civil</h3>
+        <p>Aplicação mobile com incêndios ativos, meteorologia, avisos, risco de incêndio e contactos úteis.</p>
+        <div class="tech">Flutter · Dart · APIs</div>
+      </article>
+
+      <article class="project-card">
+        <span class="project-number">03</span>
+        <h3>Site Bombeiros</h3>
+        <p>Website institucional responsivo, pensado para comunicação clara e presença digital profissional.</p>
+        <div class="tech">HTML · CSS · JavaScript</div>
+      </article>
+    </div>
+  </section>
+
+  <section id="contacto" class="section contact">
+    <span class="label">Contacto</span>
+    <h2>Vamos trabalhar juntos?</h2>
+
+    <p>
+      Estou disponível para desenvolver websites, melhorar projetos existentes
+      ou criar soluções digitais à medida.
     </p>
 
-    <div class="hero-buttons">
-      <a href="#projetos" class="btn primary">Ver projetos</a>
-      <a href="https://github.com/MartinsProgrammer" target="_blank" class="btn secondary">GitHub</a>
-    </div>
-  </div>
-
-  <div class="photo-card">
-    <img src="perfil.jpeg" alt="Leonardo Martins">
-  </div>
-</section>
-
-<section id="sobre" class="section">
-  <p class="section-tag">Sobre mim</p>
-  <h2>Gosto de transformar ideias em soluções reais.</h2>
-  <p>
-    Sou programador com interesse em desenvolvimento web, mobile e sistemas de gestão.
-    Tenho experiência com projetos práticos como websites institucionais, aplicações mobile,
-    dashboards e sistemas para empresas.
-  </p>
-</section>
-
-<section id="tecnologias" class="section">
-  <p class="section-tag">Stack</p>
-  <h2>Tecnologias que uso</h2>
-
-  <div class="tech-grid">
-    <span>HTML</span>
-    <span>CSS</span>
-    <span>JavaScript</span>
-    <span>Node.js</span>
-    <span>Express</span>
-    <span>SQLite</span>
-    <span>Flutter</span>
-    <span>Dart</span>
-    <span>Git</span>
-    <span>GitHub</span>
-  </div>
-</section>
-
-<section id="projetos" class="section">
-  <p class="section-tag">Portfólio</p>
-  <h2>Projetos em destaque</h2>
-
-  <div class="projects-grid">
-    <article class="project-card">
-      <h3>DriveGest</h3>
-      <p>Sistema de gestão para escolas de condução com alunos, estados e comunicações.</p>
-      <div class="project-tech">Node.js · SQLite · JavaScript</div>
-    </article>
-
-    <article class="project-card">
-      <h3>App Proteção Civil</h3>
-      <p>Aplicação mobile com incêndios ativos, meteorologia, risco de incêndio e contactos úteis.</p>
-      <div class="project-tech">Flutter · Dart · APIs</div>
-    </article>
-
-    <article class="project-card">
-      <h3>Site Bombeiros</h3>
-      <p>Website institucional moderno, responsivo e com foco em comunicação clara.</p>
-      <div class="project-tech">HTML · CSS · JavaScript</div>
-    </article>
-  </div>
-</section>
-
-<section id="contacto" class="section contact">
-  <p class="section-tag">Contacto</p>
-  <h2>Vamos criar algo?</h2>
-  <p>
-    Estou disponível para projetos, melhorias em websites e desenvolvimento de soluções digitais.
-  </p>
-
-  <a href="https://github.com/MartinsProgrammer" target="_blank" class="btn primary">Ver GitHub</a>
-</section>
+    <a href="https://github.com/MartinsProgrammer" target="_blank" class="btn primary">Ver GitHub</a>
+  </section>
+</main>
 
 <footer>
-  <p>© 2026 Leonardo Martins</p>
+  <p>© 2026 Leonardo Martins. Portfólio pessoal.</p>
 </footer>
 
 </body>
