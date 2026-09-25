@@ -53,8 +53,8 @@ export default function About() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={asset(profile.photo)}
-                  alt="Leonardo Martins com a farda dos Bombeiros Voluntários"
-                  className="h-full w-full object-cover object-[50%_18%] grayscale-[35%] transition-[filter,transform] duration-700 group-hover:scale-[1.03] group-hover:grayscale-0"
+                  alt="Retrato de Leonardo Martins"
+                  className="h-full w-full object-cover object-[50%_32%] grayscale-[35%] transition-[filter,transform] duration-700 group-hover:scale-[1.03] group-hover:grayscale-0"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/10 to-transparent" />
