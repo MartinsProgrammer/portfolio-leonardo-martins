@@ -90,7 +90,7 @@ export const projects: Project[] = [
     description:
       "Plataforma SaaS multi-escola para escolas de condução: alunos, instrutores, veículos, aulas, exames e pagamentos, com portais próprios para instrutor e aluno e fluxos RGPD.",
     tech: ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Tailwind"],
-    status: "Em desenvolvimento",
+    status: "Concluído",
     visual: "nexo",
     accent: "#5ff5d9",
   },
@@ -101,7 +101,7 @@ export const projects: Project[] = [
     description:
       "App Android de segurança pessoal: alerta SOS silencioso pelos botões de volume, SMS com localização para contactos de emergência e SOS Comunitário com notificações para quem está por perto.",
     tech: ["Kotlin", "Jetpack Compose", "Supabase", "Firebase"],
-    status: "Em desenvolvimento",
+    status: "Concluído",
     visual: "nora",
     accent: "#e5333f",
   },

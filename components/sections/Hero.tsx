@@ -31,17 +31,20 @@ const sides = [
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false); // rato por cima
+  const [manual, setManual] = useState(false); // alguém já escolheu
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   // Mola leve: suaviza o parallax (lerp) e evita a aceleração nativa do scroll, que não respeita o target
   const progress = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
   const y = useTransform(progress, [0, 1], ["0%", "30%"]);
   const opacity = useTransform(progress, [0, 0.7], [1, 0]);
 
-  // Alterna entre as duas facetas
+  // Alterna sozinho a cada 8s (tempo para ler); pára com o rato por cima e deixa de mudar depois de um clique
   useEffect(() => {
-    const t = setInterval(() => setI((v) => (v + 1) % sides.length), 3600);
-    return () => clearInterval(t);
-  }, [i]);
+    if (paused || manual) return;
+    const t = setTimeout(() => setI((v) => (v + 1) % sides.length), 8000);
+    return () => clearTimeout(t);
+  }, [i, paused, manual]);
 
   const current = sides[i];
 
@@ -78,6 +81,8 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...elastic, delay: 0.7 }}
           className="mt-10 max-w-xl"
+          onPointerEnter={() => setPaused(true)}
+          onPointerLeave={() => setPaused(false)}
         >
           <div className="inline-flex flex-wrap items-center gap-1 rounded-full border border-white/10 bg-white/[0.02] p-1">
             {sides.map((s, idx) => {
@@ -86,7 +91,10 @@ export default function Hero() {
               return (
                 <button
                   key={s.key}
-                  onClick={() => setI(idx)}
+                  onClick={() => {
+                    setI(idx);
+                    setManual(true);
+                  }}
                   aria-pressed={on}
                   className={`relative flex items-center gap-2 rounded-full px-4 py-2 text-sm transition-colors duration-300 ${on ? "text-white" : "text-mute hover:text-soft"}`}
                 >
