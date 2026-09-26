@@ -6,9 +6,9 @@ import { SectionHeading, Stagger, staggerContainer, staggerItem } from "@/compon
 import TiltCard from "@/components/ui/TiltCard";
 import LiquidVisual from "@/components/three/LiquidVisual";
 import { elastic } from "@/lib/motion";
-import { NexoVisual, NoraVisual } from "./ProjectVisuals";
+import { CivilVisual, NexoVisual, NoraVisual } from "./ProjectVisuals";
 
-const visuals = { nexo: NexoVisual, nora: NoraVisual } as const;
+const visuals = { nexo: NexoVisual, nora: NoraVisual, civil: CivilVisual } as const;
 
 function StatusBadge({ status }: { status: Project["status"] }) {
   const done = status === "Concluído";
@@ -25,7 +25,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
     <TiltCard accent={project.accent} max={7} className="h-full">
       <article className="flex h-full flex-col" style={{ transformStyle: "preserve-3d" }}>
-        <div className="relative m-2 aspect-[16/11] overflow-hidden rounded-[1.25rem]" style={{ transformStyle: "preserve-3d" }}>
+        <div className="relative m-2 aspect-[16/11] lg:aspect-[4/3.4] overflow-hidden rounded-[1.25rem]" style={{ transformStyle: "preserve-3d" }}>
           <LiquidVisual>
             <Visual />
           </LiquidVisual>
@@ -43,7 +43,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             </span>
             <StatusBadge status={project.status} />
           </motion.div>
-          <motion.h3 variants={staggerItem} className="mt-3 font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <motion.h3 variants={staggerItem} className="mt-3 font-display text-3xl font-semibold tracking-tight text-white">
             {project.title}
           </motion.h3>
           <motion.p variants={staggerItem} className="mt-1 text-sm italic text-mute">
@@ -76,10 +76,10 @@ export default function Projects() {
         <SectionHeading
           eyebrow="03 — Projetos"
           lines={["Projetos em", <span key="b" className="text-gradient">destaque.</span>]}
-          intro="Da gestão de escolas de condução à segurança pessoal: software pensado para ser usado todos os dias."
+          intro="Da gestão de escolas de condução à segurança pessoal e à Proteção Civil: software pensado para ser usado todos os dias."
         />
 
-        <Stagger className="mt-16 grid gap-6 md:grid-cols-2 lg:gap-8" stagger={0.15}>
+        <Stagger className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8" stagger={0.15}>
           {projects.map((p, i) => (
             <motion.div
               key={p.id}
@@ -88,6 +88,7 @@ export default function Projects() {
                 show: { opacity: 1, y: 0, scale: 1, rotateX: 0, transition: { ...elastic, staggerChildren: 0.1 } },
               }}
               style={{ transformPerspective: 1200 }}
+              className={i === 2 ? "md:col-span-2 lg:col-span-1" : ""}
             >
               <ProjectCard project={p} index={i} />
             </motion.div>

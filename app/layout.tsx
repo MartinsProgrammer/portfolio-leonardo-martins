@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://martinsprogrammer.github.io"),
   title: "Leonardo Martins — Programador Web & Mobile",
   description:
-    "Portfólio de Leonardo Martins, programador web e mobile e bombeiro voluntário em Santo Tirso, Portugal. Projetos NEXO e NORA.",
+    "Portfólio de Leonardo Martins, programador web e mobile e bombeiro voluntário em Santo Tirso, Portugal. Projetos NEXO, NORA e CivilConnect.",
   openGraph: {
     title: "Leonardo Martins — Programador Web & Mobile",
     description: "Crio soluções digitais com utilidade real.",

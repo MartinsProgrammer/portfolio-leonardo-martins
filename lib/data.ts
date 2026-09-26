@@ -38,7 +38,7 @@ export const experience: Experience[] = [
     role: "Programador",
     company: "Proteção Civil de Santo Tirso",
     description:
-      "Estágio como programador no Serviço Municipal de Proteção Civil: desenvolvimento de uma aplicação interna, manutenção de equipamentos e apoio técnico.",
+      "Estágio como programador no Serviço Municipal de Proteção Civil: desenvolvimento da app CivilConnect para a população, manutenção de equipamentos e apoio técnico.",
     highlight: true,
   },
   {
@@ -69,7 +69,7 @@ export const skills = [
   { area: "Ferramentas", items: ["Git", "GitHub", "VS Code", "Shopify"] },
 ];
 
-export type ProjectVisual = "nexo" | "nora";
+export type ProjectVisual = "nexo" | "nora" | "civil";
 
 export type Project = {
   id: string;
@@ -104,6 +104,17 @@ export const projects: Project[] = [
     status: "Em desenvolvimento",
     visual: "nora",
     accent: "#e5333f",
+  },
+  {
+    id: "civilconnect",
+    title: "CivilConnect",
+    tagline: "Proteção Civil de Santo Tirso",
+    description:
+      "App móvel da Proteção Civil para a população de Santo Tirso: incêndios ativos, risco de incêndio, meteorologia e avisos do IPMA, reporte de ninhos de vespa velutina, dicas de autoproteção e contactos de emergência, com backoffice para gerir notícias e reportes.",
+    tech: ["Flutter", "Dart", "APIs REST", "IPMA"],
+    status: "Concluído",
+    visual: "civil",
+    accent: "#ff7a1a",
   },
 ];
 
