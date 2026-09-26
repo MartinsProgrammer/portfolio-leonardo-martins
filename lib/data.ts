@@ -110,7 +110,7 @@ export const projects: Project[] = [
     title: "CivilConnect",
     tagline: "Proteção Civil de Santo Tirso",
     description:
-      "App móvel da Proteção Civil para a população de Santo Tirso: incêndios ativos, risco de incêndio, meteorologia e avisos do IPMA, reporte de ninhos de vespa velutina, dicas de autoproteção e contactos de emergência, com backoffice para gerir notícias e reportes.",
+      "App móvel da Proteção Civil para a população de Santo Tirso: incêndios ativos, risco de incêndio, queimas, meteorologia e avisos do IPMA, reporte de ninhos de vespa velutina, notícias, dicas de autoproteção e contactos de emergência, com backoffice para gerir conteúdos e reportes.",
     tech: ["Flutter", "Dart", "APIs REST", "IPMA"],
     status: "Concluído",
     visual: "civil",
