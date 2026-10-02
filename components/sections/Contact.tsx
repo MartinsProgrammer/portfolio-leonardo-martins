@@ -46,17 +46,43 @@ function SocialLink({ href, icon, label, external }: { href: string; icon: React
   );
 }
 
-export default function Contact() {
-  const [sent, setSent] = useState(false);
+type Status = "idle" | "sending" | "sent" | "error";
 
-  // Site estático: abre o cliente de e-mail com a mensagem preenchida.
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+const statusText: Record<Status, string> = {
+  idle: "A mensagem chega diretamente ao meu e-mail.",
+  sending: "A enviar…",
+  sent: "Mensagem enviada! Respondo o mais breve possível.",
+  error: "Não foi possível enviar. A abrir o teu e-mail como alternativa…",
+};
+
+export default function Contact() {
+  const [status, setStatus] = useState<Status>("idle");
+
+  // Envia a mensagem pelo FormSubmit (site estático); se falhar, abre o cliente de e-mail com a mensagem preenchida.
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const subject = `Contacto pelo portfólio — ${data.get("nome")}`;
-    const body = `${data.get("mensagem")}\n\n${data.get("nome")} · ${data.get("email")}`;
-    window.location.href = `mailto:${profile.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    setSent(true);
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const nome = String(data.get("nome") ?? "");
+    const email = String(data.get("email") ?? "");
+    const mensagem = String(data.get("mensagem") ?? "");
+    const subject = `Contacto pelo portfólio — ${nome}`;
+    setStatus("sending");
+    try {
+      const res = await fetch(`https://formsubmit.co/ajax/${profile.email}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ nome, email, mensagem, _subject: subject, _replyto: email, _template: "table" }),
+      });
+      const json: { success?: string | boolean } = await res.json().catch(() => ({}));
+      if (!res.ok || String(json.success) !== "true") throw new Error(`HTTP ${res.status}`);
+      setStatus("sent");
+      form.reset();
+    } catch {
+      setStatus("error");
+      const body = `${mensagem}\n\n${nome} · ${email}`;
+      window.location.href = `mailto:${profile.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
   };
 
   return (
@@ -93,17 +119,18 @@ export default function Contact() {
             <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
               <AnimatePresence mode="wait">
                 <motion.p
-                  key={sent ? "s" : "n"}
+                  key={status}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
-                  className="text-xs text-mute"
+                  className={`text-xs ${status === "sent" ? "text-cyan" : "text-mute"}`}
+                  aria-live="polite"
                 >
-                  {sent ? "A abrir o teu e-mail…" : "Abre o teu e-mail com a mensagem pronta."}
+                  {statusText[status]}
                 </motion.p>
               </AnimatePresence>
               <MagneticButton type="submit">
-                Enviar mensagem <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                {status === "sending" ? "A enviar…" : "Enviar mensagem"} <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </MagneticButton>
             </div>
           </form>
