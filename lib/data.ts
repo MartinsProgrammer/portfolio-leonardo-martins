@@ -12,6 +12,8 @@ export const profile = {
   email: "leozinpt0@gmail.com",
   github: "https://github.com/MartinsProgrammer",
   githubUser: "MartinsProgrammer",
+  linkedin: "https://www.linkedin.com/in/martinsprogrammer",
+  linkedinUser: "martinsprogrammer",
   photo: "/images/perfil.webp",
 };
 
@@ -33,6 +35,13 @@ export type Experience = {
 
 // Do mais recente para o mais antigo
 export const experience: Experience[] = [
+  {
+    year: 2026,
+    role: "Programador Web & Mobile",
+    company: "Freelancer",
+    description:
+      "Desenvolvimento de websites, aplicações móveis e sistemas de gestão à medida para clientes, com projetos como o NEXO e a NORA.",
+  },
   {
     year: 2025,
     role: "Programador",
