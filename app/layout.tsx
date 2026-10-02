@@ -15,9 +15,15 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Leonardo Martins — Programador Web & Mobile",
     description: "Crio soluções digitais com utilidade real.",
-    images: [asset("/images/perfil.webp")],
+    images: [{ url: asset("/images/og-image.jpg"), width: 1200, height: 628, alt: "Portfólio de Leonardo Martins: NEXO, CivilConnect e NORA" }],
     locale: "pt_PT",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Leonardo Martins — Programador Web & Mobile",
+    description: "Crio soluções digitais com utilidade real.",
+    images: [asset("/images/og-image.jpg")],
   },
 };
 
