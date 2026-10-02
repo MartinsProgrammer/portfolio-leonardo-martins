@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { profile } from "@/lib/data";
 import { MaskText, Reveal } from "@/components/ui/Reveal";
 import MagneticButton from "@/components/ui/MagneticButton";
-import { ArrowUpRight, GitHub, Mail, Pin } from "@/components/ui/Icons";
+import { ArrowUpRight, GitHub, LinkedIn, Mail, Pin } from "@/components/ui/Icons";
 
 function Field({ id, label, type = "text", textarea = false }: { id: string; label: string; type?: string; textarea?: boolean }) {
   const cls =
@@ -77,6 +77,7 @@ export default function Contact() {
           </Reveal>
           <Reveal delay={0.3}>
             <div className="mt-10 flex flex-wrap gap-3">
+              <SocialLink href={profile.linkedin} external icon={<LinkedIn className="h-5 w-5" />} label={`linkedin.com/in/${profile.linkedinUser}`} />
               <SocialLink href={profile.github} external icon={<GitHub className="h-5 w-5" />} label={`github.com/${profile.githubUser}`} />
               <SocialLink href={`mailto:${profile.email}`} icon={<Mail className="h-5 w-5" />} label={profile.email} />
               <SocialLink href="https://maps.google.com/?q=Santo+Tirso" external icon={<Pin className="h-5 w-5" />} label={profile.location} />

@@ -6,7 +6,7 @@ import { profile } from "@/lib/data";
 import { MaskText } from "@/components/ui/Reveal";
 import { elastic, snappy, spring } from "@/lib/motion";
 import MagneticButton from "@/components/ui/MagneticButton";
-import { ArrowRight, Code, Flame, GitHub } from "@/components/ui/Icons";
+import { ArrowRight, Code, Flame, GitHub, LinkedIn } from "@/components/ui/Icons";
 
 
 const sides = [
@@ -138,6 +138,9 @@ export default function Hero() {
           </MagneticButton>
           <MagneticButton href={profile.github} variant="ghost" external>
             <GitHub className="h-4 w-4" /> GitHub
+          </MagneticButton>
+          <MagneticButton href={profile.linkedin} variant="ghost" external>
+            <LinkedIn className="h-4 w-4" /> LinkedIn
           </MagneticButton>
         </motion.div>
       </motion.div>
