@@ -348,6 +348,8 @@ function Hero3D({ layout, frontPortal }: { layout: Layout; frontPortal?: RefObje
   const hit = useMemo(() => new THREE.Vector3(), []);
   const local = useMemo(() => new THREE.Vector3(), []);
   const wordEls = useRef<HTMLElement[]>([]);
+  // Lido da janela: no primeiro render o canvas ainda não tem tamanho
+  const [withWords] = useState(() => innerWidth >= 1024);
 
   useFrame((state, delta) => {
     const dt = Math.min(delta, 0.05);
@@ -386,12 +388,12 @@ function Hero3D({ layout, frontPortal }: { layout: Layout; frontPortal?: RefObje
     }
 
     // Palavras flutuantes desvanecem com a desintegração
-    const wordOpacity = String(clamp01(1 - smooth.s1 * 1.8));
-    if (!layout.mobile && !wordEls.current.length && state.gl.domElement) {
+    const wordOpacity = layout.mobile ? "0" : String(clamp01(1 - smooth.s1 * 1.8));
+    if (withWords && !wordEls.current.length && state.gl.domElement) {
       wordEls.current = Array.from(document.querySelectorAll<HTMLElement>(".kw"));
     }
     wordEls.current.forEach((el) => (el.style.opacity = wordOpacity));
-    if (words.current) words.current.visible = smooth.s1 < 0.6;
+    if (words.current) words.current.visible = !layout.mobile && smooth.s1 < 0.6;
   });
 
   return (
@@ -403,8 +405,12 @@ function Hero3D({ layout, frontPortal }: { layout: Layout; frontPortal?: RefObje
         </mesh>
       </Billboard>
 
-      {/* Palavras-chave em eixos 3D reais (Float + Html do drei). Desligadas em mobile. */}
-      {!layout.mobile && (
+      {/*
+        Palavras-chave em eixos 3D reais (Float + Html do drei). Não existem em mobile.
+        Decidido só no arranque: desmontar um Html a meio de um render (ao redimensionar) dá erro no React,
+        por isso depois disso apenas se escondem.
+      */}
+      {withWords && (
         <group ref={words}>
           <Float speed={1.6} rotationIntensity={0.9} floatIntensity={1.1}>
             <Html transform distanceFactor={3.2} position={[-0.2, 1.55, 0.9]} portal={frontPortal as RefObject<HTMLElement>} pointerEvents="none">
