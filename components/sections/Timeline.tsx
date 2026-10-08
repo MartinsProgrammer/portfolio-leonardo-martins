@@ -2,11 +2,13 @@
 
 import { motion, useScroll, useSpring, useTransform, type MotionValue, type Variants } from "framer-motion";
 import { useRef } from "react";
-import { experience, type Experience } from "@/lib/data";
+import type { Experience } from "@/lib/data";
+import { useContent } from "@/lib/i18n";
 import { SectionHeading, staggerContainer } from "@/components/ui/Reveal";
 import { elastic } from "@/lib/motion";
 
 export default function Timeline() {
+  const { experience, t } = useContent();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 70%", "end 60%"] });
   // Mola sobre o progresso do scroll: a linha "enche" com inércia em vez de saltar
@@ -18,9 +20,9 @@ export default function Timeline() {
     <section id="experiencia" className="relative py-28 sm:py-36">
       <div className="container-x">
         <SectionHeading
-          eyebrow="02 — Experiência"
-          lines={["Experiência real", <span key="b" className="text-mute">na área das TI.</span>]}
-          intro="Ao longo da formação desenvolvi competências em programação, desenvolvimento web, aplicações móveis, APIs, bases de dados e suporte informático, através de estágios em contexto real."
+          eyebrow={t.timeline.eyebrow}
+          lines={[t.timeline.lines[0], <span key="b" className="text-mute">{t.timeline.lines[1]}</span>]}
+          intro={t.timeline.intro}
         />
 
         <div ref={ref} className="relative mt-20">
@@ -47,7 +49,7 @@ export default function Timeline() {
 
           <ol className="space-y-16 md:space-y-28">
             {experience.map((item, i) => (
-              <TimelineItem key={item.company} item={item} index={i} total={experience.length} progress={progress} />
+              <TimelineItem key={item.year} item={item} index={i} total={experience.length} progress={progress} />
             ))}
           </ol>
         </div>

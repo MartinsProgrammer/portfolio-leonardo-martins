@@ -2,10 +2,11 @@
 
 import { useState, type FormEvent, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { profile } from "@/lib/data";
+import { asset, profile } from "@/lib/data";
+import { useContent, useLang } from "@/lib/i18n";
 import { MaskText, Reveal } from "@/components/ui/Reveal";
 import MagneticButton from "@/components/ui/MagneticButton";
-import { ArrowUpRight, GitHub, LinkedIn, Mail, Pin } from "@/components/ui/Icons";
+import { ArrowRight, ArrowUpRight, GitHub, LinkedIn, Mail, Pin } from "@/components/ui/Icons";
 
 function Field({ id, label, type = "text", textarea = false }: { id: string; label: string; type?: string; textarea?: boolean }) {
   const cls =
@@ -48,14 +49,11 @@ function SocialLink({ href, icon, label, external }: { href: string; icon: React
 
 type Status = "idle" | "sending" | "sent" | "error";
 
-const statusText: Record<Status, string> = {
-  idle: "A mensagem chega diretamente ao meu e-mail.",
-  sending: "A enviar…",
-  sent: "Mensagem enviada! Respondo o mais breve possível.",
-  error: "Não foi possível enviar. A abrir o teu e-mail como alternativa…",
-};
 
 export default function Contact() {
+  const { t } = useContent();
+  const { lang } = useLang();
+  const cv = profile.cv[lang];
   const [status, setStatus] = useState<Status>("idle");
 
   // Envia a mensagem pelo FormSubmit (site estático); se falhar, abre o cliente de e-mail com a mensagem preenchida.
@@ -90,15 +88,16 @@ export default function Contact() {
       <div className="container-x grid gap-16 lg:grid-cols-2 lg:gap-24">
         <div>
           <Reveal>
-            <p className="eyebrow">04 — Contacto</p>
+            <p className="eyebrow">{t.contact.eyebrow}</p>
           </Reveal>
           <MaskText
-            lines={["Vamos criar", "algo com", <span key="q" className="text-gradient">qualidade?</span>]}
+            key={lang}
+            lines={[t.contact.lines[0], t.contact.lines[1], <span key="q" className="text-gradient">{t.contact.lines[2]}</span>]}
             className="mt-5 font-display text-[clamp(2.4rem,6vw,4.75rem)] font-semibold leading-[1] tracking-[-0.04em] text-white"
           />
           <Reveal delay={0.2}>
             <p className="mt-8 max-w-md text-base leading-relaxed text-mute sm:text-lg">
-              Estou disponível para desenvolver websites, melhorar projetos existentes ou criar soluções digitais à medida.
+              {t.contact.intro}
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -108,14 +107,25 @@ export default function Contact() {
               <SocialLink href={`mailto:${profile.email}`} icon={<Mail className="h-5 w-5" />} label={profile.email} />
               <SocialLink href="https://maps.google.com/?q=Santo+Tirso" external icon={<Pin className="h-5 w-5" />} label={profile.location} />
             </div>
+            {cv && (
+              <a
+                href={asset(cv)}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-cursor="magnet"
+                className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-3 text-sm text-white transition-colors hover:border-cyan/60"
+              >
+                <ArrowRight className="h-4 w-4 rotate-90" /> {t.hero.cv}
+              </a>
+            )}
           </Reveal>
         </div>
 
         <Reveal delay={0.15}>
           <form onSubmit={onSubmit} className="glass relative space-y-8 rounded-3xl p-6 sm:p-10">
-            <Field id="nome" label="O teu nome" />
-            <Field id="email" label="E-mail" type="email" />
-            <Field id="mensagem" label="Conta-me sobre o projeto" textarea />
+            <Field id="nome" label={t.contact.name} />
+            <Field id="email" label={t.contact.email} type="email" />
+            <Field id="mensagem" label={t.contact.message} textarea />
             <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
               <AnimatePresence mode="wait">
                 <motion.p
@@ -126,11 +136,11 @@ export default function Contact() {
                   className={`text-xs ${status === "sent" ? "text-cyan" : "text-mute"}`}
                   aria-live="polite"
                 >
-                  {statusText[status]}
+                  {t.contact.status[status]}
                 </motion.p>
               </AnimatePresence>
               <MagneticButton type="submit">
-                {status === "sending" ? "A enviar…" : "Enviar mensagem"} <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                {status === "sending" ? t.contact.status.sending : t.contact.send} <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </MagneticButton>
             </div>
           </form>

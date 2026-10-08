@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Billboard, Float, Html, PerformanceMonitor } from "@react-three/drei";
 import * as THREE from "three";
 import { snoise, sphereSurface } from "./glsl";
+import { content } from "@/lib/data";
 
 /*
   Cena 3D única, fixa atrás da página:
@@ -302,7 +303,18 @@ function useLayout(): Layout {
   }, [size.width, size.height, camera]);
 }
 
-function Keyword({ children, color, className = "" }: { children: string; color: string; className?: string }) {
+/*
+  As duas línguas ficam sempre dentro do Html e o CSS mostra a ativa (lang do <html>):
+  mudar os filhos de um Html do drei recria a raiz React dele e dá erro.
+*/
+const word = (i: number) => (
+  <>
+    <span className="kw-pt">{content.pt.t.scene.words[i]}</span>
+    <span className="kw-en">{content.en.t.scene.words[i]}</span>
+  </>
+);
+
+function Keyword({ children, color, className = "" }: { children: React.ReactNode; color: string; className?: string }) {
   return (
     <span
       className={`kw block select-none whitespace-nowrap font-display font-semibold tracking-[-0.02em] ${className}`}
@@ -414,17 +426,17 @@ function Hero3D({ layout, frontPortal }: { layout: Layout; frontPortal?: RefObje
         <group ref={words}>
           <Float speed={1.6} rotationIntensity={0.9} floatIntensity={1.1}>
             <Html transform distanceFactor={3.2} position={[-0.2, 1.55, 0.9]} portal={frontPortal as RefObject<HTMLElement>} pointerEvents="none">
-              <Keyword color="#3ee8ff" className="text-4xl">Código</Keyword>
+              <Keyword color="#3ee8ff" className="text-4xl">{word(0)}</Keyword>
             </Html>
           </Float>
           <Float speed={1.2} rotationIntensity={1.2} floatIntensity={1.4}>
             <Html transform distanceFactor={3.2} position={[1.3, -1.25, -0.9]} pointerEvents="none">
-              <Keyword color="#ff5a1f" className="text-4xl">Fogo</Keyword>
+              <Keyword color="#ff5a1f" className="text-4xl">{word(1)}</Keyword>
             </Html>
           </Float>
           <Float speed={1.9} rotationIntensity={0.7} floatIntensity={0.9}>
             <Html transform distanceFactor={3.2} position={[-1.55, -0.95, -0.6]} pointerEvents="none">
-              <Keyword color="#ffffff" className="text-2xl">Impacto</Keyword>
+              <Keyword color="#ffffff" className="text-2xl">{word(2)}</Keyword>
             </Html>
           </Float>
         </group>
@@ -573,7 +585,7 @@ function World({ frontPortal, reduced }: { frontPortal?: RefObject<HTMLElement |
 export default function Scene({ frontPortal, onReady }: { frontPortal?: RefObject<HTMLElement | null>; onReady?: () => void }) {
   const [reduced] = useState(() => typeof window !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches);
   const [mobile] = useState(() => typeof window !== "undefined" && innerWidth < 1024);
-  const maxDpr = 1.5;
+  const maxDpr = mobile ? 1.25 : 1.5; // menos píxeis em ecrãs pequenos (que já têm muita densidade)
   const [dpr, setDpr] = useState(maxDpr);
 
   return (

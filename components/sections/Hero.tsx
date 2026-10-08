@@ -2,33 +2,24 @@
 
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { profile } from "@/lib/data";
+import { asset, profile } from "@/lib/data";
+import { useContent, useLang } from "@/lib/i18n";
 import { MaskText } from "@/components/ui/Reveal";
-import { elastic, snappy, spring } from "@/lib/motion";
+import { snappy, spring } from "@/lib/motion";
 import MagneticButton from "@/components/ui/MagneticButton";
 import { ArrowRight, Code, Flame, GitHub, LinkedIn } from "@/components/ui/Icons";
 
 
-const sides = [
-  {
-    key: "dev",
-    label: "Programador",
-    icon: Code,
-    color: "text-cyan",
-    ring: "bg-cyan/10 ring-cyan/40",
-    text: "Websites, aplicações móveis e sistemas de gestão — de Next.js e Supabase a Flutter e Kotlin.",
-  },
-  {
-    key: "bv",
-    label: "Bombeiro Voluntário",
-    icon: Flame,
-    color: "text-ember",
-    ring: "bg-ember/10 ring-ember/40",
-    text: "Nos Bombeiros Voluntários Tirsenses, onde aprendi responsabilidade, disciplina e atenção ao detalhe.",
-  },
+const sideStyles = [
+  { key: "dev", icon: Code, color: "text-cyan", ring: "bg-cyan/10 ring-cyan/40" },
+  { key: "bv", icon: Flame, color: "text-ember", ring: "bg-ember/10 ring-ember/40" },
 ];
 
 export default function Hero() {
+  const { t } = useContent();
+  const { lang } = useLang();
+  const sides = sideStyles.map((st, i) => ({ ...st, ...t.hero.sides[i] }));
+  const cv = profile.cv[lang];
   const ref = useRef<HTMLElement>(null);
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false); // rato por cima
@@ -52,9 +43,8 @@ export default function Hero() {
     <section ref={ref} id="topo" className="relative flex min-h-[100svh] items-center pt-28 pb-24">
       <motion.div style={{ y, opacity }} className="container-x relative z-10">
         <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...spring, delay: 0.1 }}
+          data-hero-in
+          style={{ animationDelay: "0.1s" }}
           className="mb-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-soft"
         >
           <span className="relative flex h-2 w-2">
@@ -67,19 +57,15 @@ export default function Hero() {
         <MaskText
           as="h1"
           inView={false}
-          lines={[
-            "Crio soluções",
-            "digitais com",
-            <span key="u" className="text-gradient">utilidade real.</span>,
-          ]}
+          key={lang}
+          lines={[t.hero.lines[0], t.hero.lines[1], <span key="u" className="text-gradient">{t.hero.lines[2]}</span>]}
           className="font-display text-[clamp(2.6rem,8.5vw,6.75rem)] font-semibold leading-[0.98] tracking-[-0.045em] text-white"
         />
 
         {/* Dualidade Programador | Bombeiro Voluntário */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...elastic, delay: 0.7 }}
+          data-hero-in
+          style={{ animationDelay: "0.7s" }}
           className="mt-10 max-w-xl"
           onPointerEnter={() => setPaused(true)}
           onPointerLeave={() => setPaused(false)}
@@ -112,9 +98,9 @@ export default function Hero() {
             })}
           </div>
           <div className="relative mt-5 min-h-[3.5rem]">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
               <motion.p
-                key={current.key}
+                key={`${current.key}-${lang}`}
                 initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
@@ -128,14 +114,18 @@ export default function Hero() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...elastic, delay: 0.9 }}
+          data-hero-in
+          style={{ animationDelay: "0.9s" }}
           className="mt-10 flex flex-wrap items-center gap-4"
         >
           <MagneticButton href="#projetos">
-            Ver projetos <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            {t.hero.viewProjects} <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </MagneticButton>
+          {cv && (
+            <MagneticButton href={asset(cv)} variant="ghost" external>
+              <ArrowRight className="h-4 w-4 rotate-90" /> {t.hero.cv}
+            </MagneticButton>
+          )}
           <MagneticButton href={profile.github} variant="ghost" external>
             <GitHub className="h-4 w-4" /> GitHub
           </MagneticButton>
@@ -147,13 +137,12 @@ export default function Hero() {
 
       <motion.a
         href="#sobre"
-        aria-label="Descer para a secção Sobre"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.6, duration: 1 }}
+        aria-label={t.hero.scrollAria}
+        data-hero-in="fade"
+        style={{ animationDelay: "1.6s" }}
         className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 font-mono text-[0.65rem] uppercase tracking-[0.3em] text-mute sm:flex"
       >
-        Scroll
+        {t.hero.scroll}
         <span className="relative h-12 w-px overflow-hidden bg-white/10">
           <motion.span
             className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-transparent to-cyan"

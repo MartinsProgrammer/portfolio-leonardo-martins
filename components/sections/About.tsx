@@ -1,33 +1,41 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { asset, facts, metrics, profile, skills } from "@/lib/data";
+import { asset, profile, skillsFor } from "@/lib/data";
+import { useContent } from "@/lib/i18n";
 import { Reveal, SectionHeading, Stagger, staggerContainer, staggerItem } from "@/components/ui/Reveal";
 import { snappy } from "@/lib/motion";
 import Counter from "@/components/ui/Counter";
 import TiltCard from "@/components/ui/TiltCard";
 
 export default function About() {
+  const c = useContent();
+  const { facts, metrics, t } = c;
+  const skills = skillsFor(c);
+  const [p1a, p1b, p1c] = t.about.p1;
+  const [p2a, p2b, p2c] = t.about.p2;
   return (
     <section id="sobre" className="relative py-28 sm:py-36">
       <div className="container-x">
         <SectionHeading
-          eyebrow="01 — Sobre"
-          lines={["Soluções simples,", <span key="b" className="text-mute">úteis e bem estruturadas.</span>]}
+          eyebrow={t.about.eyebrow}
+          lines={[t.about.lines[0], <span key="b" className="text-mute">{t.about.lines[1]}</span>]}
         />
 
         <div className="mt-16 grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
           <div className="space-y-6 text-base leading-relaxed text-mute sm:text-lg">
             <Reveal>
               <p>
-                Sou o <span className="text-white">Leonardo Martins</span>, programador web e mobile em Portugal. Desenvolvo websites,
-                aplicações e sistemas de gestão com foco em utilidade, organização e boa experiência de utilização.
+                {p1a}
+                <span className="text-white">{p1b}</span>
+                {p1c}
               </p>
             </Reveal>
             <Reveal delay={0.1}>
               <p>
-                Para além da programação, sou <span className="text-ember">Bombeiro Voluntário</span>. Uma experiência que me trouxe
-                responsabilidade, disciplina e atenção ao detalhe — e que levo para cada linha de código.
+                {p2a}
+                <span className="text-ember">{p2b}</span>
+                {p2c}
               </p>
             </Reveal>
 
@@ -53,15 +61,15 @@ export default function About() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={asset(profile.photo)}
-                  alt="Retrato de Leonardo Martins"
+                  alt={t.about.photoAlt}
                   className="h-full w-full object-cover object-[50%_32%] grayscale-[35%] transition-[filter,transform] duration-700 group-hover:scale-[1.03] group-hover:grayscale-0"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/10 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-6" style={{ transform: "translateZ(40px)" }}>
                   <div>
-                    <p className="font-display text-xl font-semibold text-white">Leonardo Martins</p>
-                    <p className="mt-1 text-sm text-mute">Programador Web & Mobile</p>
+                    <p className="font-display text-xl font-semibold text-white">{profile.name}</p>
+                    <p className="mt-1 text-sm text-mute">{t.about.role}</p>
                   </div>
                   <span className="rounded-full border border-ember/40 bg-ember/10 px-3 py-1 font-mono text-[0.65rem] uppercase tracking-[0.15em] text-ember">
                     BV Tirsenses
@@ -74,8 +82,8 @@ export default function About() {
 
         {/* Métricas */}
         <Stagger className="mt-20 grid grid-cols-1 gap-px overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.06] sm:grid-cols-3">
-          {metrics.map((m) => (
-            <motion.div key={m.label} variants={staggerItem} className="bg-ink/90 p-8 sm:p-10">
+          {metrics.map((m, i) => (
+            <motion.div key={i} variants={staggerItem} className="bg-ink/90 p-8 sm:p-10">
               <p className="font-display text-6xl font-semibold tracking-[-0.04em] text-white sm:text-7xl">
                 <Counter value={m.value} suffix={m.suffix} />
               </p>
@@ -86,8 +94,8 @@ export default function About() {
 
         {/* Stack: cada área e cada tecnologia surgem em cascata (0.1s) */}
         <Stagger className="mt-20 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
-          {skills.map((s) => (
-            <motion.div key={s.area} variants={staggerContainer(0.1)}>
+          {skills.map((s, i) => (
+            <motion.div key={i} variants={staggerContainer(0.1)}>
               <motion.p variants={staggerItem} className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-cyan">
                 {s.area}
               </motion.p>

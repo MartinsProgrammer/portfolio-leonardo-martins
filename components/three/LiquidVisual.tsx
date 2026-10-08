@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
-import * as THREE from "three";
-import { getFontEmbedCSS, toCanvas } from "html-to-image";
+import type * as THREE from "three";
 import { snoise } from "./glsl";
 
 /*
@@ -11,6 +10,7 @@ import { snoise } from "./glsl";
   dela para uma textura e desenhamos por cima um plano WebGL com um shader de
   fluido (ondulação + ruído + aberração cromática) centrado no cursor.
   O loop só corre enquanto o efeito está visível. Desligado em ecrãs táteis.
+  O three.js e o html-to-image só são descarregados no primeiro hover (não pesam no arranque).
 */
 
 const vertex = /* glsl */ `
@@ -56,6 +56,8 @@ const fragment = /* glsl */ `
 `;
 
 let fontCSS: Promise<string> | null = null;
+let libs: Promise<[typeof import("three"), typeof import("html-to-image")]> | null = null;
+const loadLibs = () => (libs ??= Promise.all([import("three"), import("html-to-image")]));
 
 export default function LiquidVisual({ children }: { children: ReactNode }) {
   const wrap = useRef<HTMLDivElement>(null);
@@ -70,13 +72,17 @@ export default function LiquidVisual({ children }: { children: ReactNode }) {
     const capable = matchMedia("(hover: hover) and (pointer: fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!capable) return;
 
+    let T: typeof import("three") | null = null;
+    let toCanvas: typeof import("html-to-image").toCanvas;
+    let getFontEmbedCSS: typeof import("html-to-image").getFontEmbedCSS;
     let renderer: THREE.WebGLRenderer | null = null;
     let material: THREE.ShaderMaterial | null = null;
     let texture: THREE.Texture | null = null;
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    const mouse = new THREE.Vector2(0.5, 0.5);
-    const target = new THREE.Vector2(0.5, 0.5);
+    let scene: THREE.Scene;
+    let camera: THREE.OrthographicCamera;
+    // Rato em UV (0..1), suavizado no loop
+    const mouse = { x: 0.5, y: 0.5 };
+    const target = { x: 0.5, y: 0.5 };
     let strength = 0;
     let goal = 0;
     let raf = 0;
@@ -84,22 +90,29 @@ export default function LiquidVisual({ children }: { children: ReactNode }) {
     let capturing = false;
     let last = performance.now();
 
-    const setup = () => {
+    const setup = async () => {
       if (renderer) return;
-      renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: false, alpha: false, powerPreference: "high-performance" });
+      const [three, h2i] = await loadLibs();
+      if (renderer) return;
+      T = three;
+      toCanvas = h2i.toCanvas;
+      getFontEmbedCSS = h2i.getFontEmbedCSS;
+      scene = new T.Scene();
+      camera = new T.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      renderer = new T.WebGLRenderer({ canvas: cv, antialias: false, alpha: false, powerPreference: "high-performance" });
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-      material = new THREE.ShaderMaterial({
+      material = new T.ShaderMaterial({
         vertexShader: vertex,
         fragmentShader: fragment,
         uniforms: {
           uTex: { value: null },
-          uMouse: { value: mouse },
+          uMouse: { value: new T.Vector2(0.5, 0.5) },
           uStrength: { value: 0 },
           uTime: { value: 0 },
           uAspect: { value: 1 },
         },
       });
-      scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+      scene.add(new T.Mesh(new T.PlaneGeometry(2, 2), material));
     };
 
     const loop = () => {
@@ -107,8 +120,10 @@ export default function LiquidVisual({ children }: { children: ReactNode }) {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
       strength += (goal - strength) * 0.08;
-      mouse.lerp(target, 0.12);
+      mouse.x += (target.x - mouse.x) * 0.12;
+      mouse.y += (target.y - mouse.y) * 0.12;
       if (material && renderer) {
+        material.uniforms.uMouse.value.set(mouse.x, mouse.y);
         material.uniforms.uStrength.value = strength;
         material.uniforms.uTime.value += dt;
         renderer.render(scene, camera);
@@ -132,17 +147,17 @@ export default function LiquidVisual({ children }: { children: ReactNode }) {
       if (capturing) return;
       capturing = true;
       try {
-        setup();
+        await setup();
         const r = el.getBoundingClientRect();
         const w = node.offsetWidth;
         const h = node.offsetHeight;
         fontCSS ??= getFontEmbedCSS(node);
         const snap = await toCanvas(node, { pixelRatio: Math.min(devicePixelRatio, 2), fontEmbedCSS: await fontCSS, width: w, height: h });
-        if (!renderer || !material) return;
+        if (!renderer || !material || !T) return;
         texture?.dispose();
-        texture = new THREE.CanvasTexture(snap);
-        texture.colorSpace = THREE.NoColorSpace;
-        texture.minFilter = THREE.LinearFilter;
+        texture = new T.CanvasTexture(snap);
+        texture.colorSpace = T.NoColorSpace;
+        texture.minFilter = T.LinearFilter;
         texture.generateMipmaps = false;
         material.uniforms.uTex.value = texture;
         material.uniforms.uAspect.value = w / h;
@@ -167,8 +182,9 @@ export default function LiquidVisual({ children }: { children: ReactNode }) {
     };
     const onMove = (e: PointerEvent) => {
       const r = el.getBoundingClientRect();
-      target.set((e.clientX - r.left) / r.width, 1 - (e.clientY - r.top) / r.height);
-      if (!running && goal === 0) mouse.copy(target);
+      target.x = (e.clientX - r.left) / r.width;
+      target.y = 1 - (e.clientY - r.top) / r.height;
+      if (!running && goal === 0) Object.assign(mouse, target);
     };
     const onLeave = () => {
       goal = 0;

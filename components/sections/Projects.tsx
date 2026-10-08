@@ -2,7 +2,8 @@
 
 import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { profile, projects, type Project } from "@/lib/data";
+import { asset, profile, type Project } from "@/lib/data";
+import { useContent } from "@/lib/i18n";
 import { SectionHeading } from "@/components/ui/Reveal";
 import TiltCard from "@/components/ui/TiltCard";
 import LiquidVisual from "@/components/three/LiquidVisual";
@@ -19,20 +20,24 @@ import { CivilVisual, NexoVisual, NoraVisual } from "./ProjectVisuals";
 */
 
 const visuals = { nexo: NexoVisual, nora: NoraVisual, civil: CivilVisual } as const;
-const intro = "Da gestão de escolas de condução à segurança pessoal e à Proteção Civil: software pensado para ser usado todos os dias.";
-const heading = ["Projetos em", <span key="b" className="text-gradient">destaque.</span>];
 
-type Opened = { project: Project; from: DOMRect };
+type Opened = { id: string; from: DOMRect };
 type OpenFn = (p: Project, el: HTMLElement) => void;
 
-const wrap = (i: number) => projects[(i + projects.length) % projects.length];
+const wrapIn = (list: Project[], i: number) => list[(i + list.length) % list.length];
 
-function StatusBadge({ status }: { status: Project["status"] }) {
-  const done = status === "Concluído";
+/* Título da secção (igual nos dois modos) */
+function Heading() {
+  const { t } = useContent();
+  return <SectionHeading eyebrow={t.projects.eyebrow} lines={[t.projects.lines[0], <span key="b" className="text-gradient">{t.projects.lines[1]}</span>]} intro={t.projects.intro} />;
+}
+
+function StatusBadge({ done }: { done: boolean }) {
+  const { t } = useContent();
   return (
     <span className="inline-flex items-center gap-2 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-mute">
       <span className={`h-1.5 w-1.5 rounded-full ${done ? "bg-emerald-400" : "animate-pulse bg-amber-400"}`} />
-      {status}
+      {done ? t.projects.done : t.projects.wip}
     </span>
   );
 }
@@ -62,9 +67,10 @@ function CardVisual({ project, hidden }: { project: Project; hidden: boolean }) 
 }
 
 function OpenLabel({ project }: { project: Project }) {
+  const { t } = useContent();
   return (
     <span className="mt-6 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] transition-[gap] duration-300 group-hover:gap-3" style={{ color: project.accent }}>
-      Abrir projeto <ArrowRight className="h-4 w-4" />
+      {t.projects.open} <ArrowRight className="h-4 w-4" />
     </span>
   );
 }
@@ -84,6 +90,7 @@ function PinnedCard({ project, index, x, layout, openId, onOpen }: {
   openId?: string;
   onOpen: OpenFn;
 }) {
+  const { t } = useContent();
   // As medidas vêm de uma ref, para o transform usar sempre os valores atuais
   const m = useRef(layout);
   m.current = layout;
@@ -104,7 +111,7 @@ function PinnedCard({ project, index, x, layout, openId, onOpen }: {
           onClick={openFrom(onOpen, project)}
           className="grid h-full w-full grid-cols-[1.2fr_1fr] text-left"
           style={{ transformStyle: "preserve-3d" }}
-          aria-label={`Abrir o projeto ${project.title}`}
+          aria-label={t.projects.openAria(project.title)}
         >
           <div className="m-2">
             <CardVisual project={project} hidden={openId === project.id} />
@@ -114,7 +121,7 @@ function PinnedCard({ project, index, x, layout, openId, onOpen }: {
               <span className="font-mono text-xs" style={{ color: project.accent }}>
                 0{index + 1}.
               </span>
-              <StatusBadge status={project.status} />
+              <StatusBadge done={project.done} />
             </div>
             <h3 className="mt-4 font-display text-4xl font-semibold tracking-tight text-white xl:text-5xl">{project.title}</h3>
             <p className="mt-1 text-sm italic text-mute">{project.tagline}</p>
@@ -129,6 +136,7 @@ function PinnedCard({ project, index, x, layout, openId, onOpen }: {
 }
 
 function PinnedTrack({ openId, onOpen }: { openId?: string; onOpen: OpenFn }) {
+  const { projects, t } = useContent();
   const section = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const distance = useMotionValue(0);
@@ -174,9 +182,9 @@ function PinnedTrack({ openId, onOpen }: { openId?: string; onOpen: OpenFn }) {
       <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
         <motion.div ref={track} style={{ x }} className="flex items-center gap-[5vw] pr-[18vw] pl-[max(2rem,calc((100vw-76rem)/2+2rem))]">
           <div className="w-[min(34vw,460px)] shrink-0">
-            <SectionHeading eyebrow="03 — Projetos" lines={heading} intro={intro} />
+            <Heading />
             <p className="mt-10 flex items-center gap-3 font-mono text-[0.65rem] uppercase tracking-[0.25em] text-mute">
-              Continua a fazer scroll <ArrowRight className="h-3.5 w-3.5" />
+              {t.projects.keepScrolling} <ArrowRight className="h-3.5 w-3.5" />
             </p>
           </div>
 
@@ -185,10 +193,10 @@ function PinnedTrack({ openId, onOpen }: { openId?: string; onOpen: OpenFn }) {
           ))}
 
           <div className="w-[min(26vw,340px)] shrink-0">
-            <p className="eyebrow">E há mais</p>
-            <p className="mt-4 font-display text-3xl font-semibold tracking-tight text-white">Outros trabalhos estão no meu GitHub.</p>
+            <p className="eyebrow">{t.projects.moreEyebrow}</p>
+            <p className="mt-4 font-display text-3xl font-semibold tracking-tight text-white">{t.projects.moreText}</p>
             <a href={profile.github} target="_blank" rel="noreferrer" data-cursor="magnet" className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-3 text-sm text-white transition-colors hover:border-cyan/60">
-              <GitHub className="h-4 w-4" /> Ver GitHub
+              <GitHub className="h-4 w-4" /> {t.projects.seeGithub}
             </a>
           </div>
         </motion.div>
@@ -213,6 +221,7 @@ function PinnedTrack({ openId, onOpen }: { openId?: string; onOpen: OpenFn }) {
 /* --------------------------------------------------------- telemóvel: swipe */
 
 function SwipeTrack({ openId, onOpen }: { openId?: string; onOpen: OpenFn }) {
+  const { projects, t } = useContent();
   const rail = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
@@ -228,13 +237,13 @@ function SwipeTrack({ openId, onOpen }: { openId?: string; onOpen: OpenFn }) {
   return (
     <div className="py-28 sm:py-36">
       <div className="container-x">
-        <SectionHeading eyebrow="03 — Projetos" lines={heading} intro={intro} />
+        <Heading />
       </div>
       <div ref={rail} onScroll={onScroll} className="mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
         {projects.map((p, i) => (
           <div key={p.id} className="w-[86vw] max-w-[520px] shrink-0 snap-center">
             <TiltCard accent={p.accent} max={5} className="h-full">
-              <button type="button" onClick={openFrom(onOpen, p)} className="flex h-full w-full flex-col text-left" aria-label={`Abrir o projeto ${p.title}`}>
+              <button type="button" onClick={openFrom(onOpen, p)} className="flex h-full w-full flex-col text-left" aria-label={t.projects.openAria(p.title)}>
                 <div className="m-2 aspect-[16/11]">
                   <CardVisual project={p} hidden={openId === p.id} />
                 </div>
@@ -243,7 +252,7 @@ function SwipeTrack({ openId, onOpen }: { openId?: string; onOpen: OpenFn }) {
                     <span className="font-mono text-xs" style={{ color: p.accent }}>
                       0{i + 1}.
                     </span>
-                    <StatusBadge status={p.status} />
+                    <StatusBadge done={p.done} />
                   </div>
                   <h3 className="mt-3 font-display text-3xl font-semibold tracking-tight text-white">{p.title}</h3>
                   <p className="mt-1 text-sm italic text-mute">{p.tagline}</p>
@@ -273,16 +282,30 @@ function finalRect() {
   return { top: vh * 0.07, left: vw * 0.04, width: vw * 0.92, height: Math.min(vh * 0.36, vw * 0.92 * 0.7) };
 }
 
-function ProjectModal({ opened, onClose, onSwitch }: { opened: Opened; onClose: () => void; onSwitch: (p: Project) => void }) {
-  const { project, from } = opened;
+function CaseBlock({ label, accent, children }: { label: string; accent: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-8">
+      <p className="flex items-center gap-3 font-mono text-[0.68rem] uppercase tracking-[0.2em]" style={{ color: accent }}>
+        <span className="h-px w-6" style={{ background: accent }} />
+        {label}
+      </p>
+      <div className="mt-3 leading-relaxed text-soft">{children}</div>
+    </div>
+  );
+}
+
+function ProjectModal({ opened, onClose, onSwitch }: { opened: Opened; onClose: () => void; onSwitch: (id: string) => void }) {
+  const { projects, t } = useContent();
+  const index = Math.max(0, projects.findIndex((p) => p.id === opened.id));
+  const project = projects[index];
+  const { from } = opened;
   const Visual = visuals[project.visual];
-  const index = projects.indexOf(project);
   const [to] = useState(finalRect);
   const [wide] = useState(() => innerWidth >= 1024);
   const fromRect = { top: from.top, left: from.left, width: from.width, height: from.height };
   const spring = { type: "spring", stiffness: 110, damping: 19, mass: 0.9 } as const;
-  const prev = wrap(index - 1);
-  const next = wrap(index + 1);
+  const prev = wrapIn(projects, index - 1);
+  const next = wrapIn(projects, index + 1);
 
   return (
     <motion.div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label={project.title}>
@@ -311,6 +334,7 @@ function ProjectModal({ opened, onClose, onSwitch }: { opened: Opened; onClose: 
         </AnimatePresence>
       </motion.div>
 
+      {/* Estudo de caso: o problema, o que construí, o resultado (se existir), capturas e stack */}
       <motion.div
         key={project.id}
         data-lenis-prevent
@@ -320,20 +344,49 @@ function ProjectModal({ opened, onClose, onSwitch }: { opened: Opened; onClose: 
         animate={{ opacity: 1, y: 0, transition: { ...snappy, delay: 0.25 } }}
         exit={{ opacity: 0, y: 20, transition: { duration: 0.2 } }}
       >
-        <div className="flex min-h-full flex-col justify-center">
+        <div className="flex min-h-full flex-col justify-center py-2">
           <div className="flex items-center gap-4">
             <span className="font-mono text-xs" style={{ color: project.accent }}>
               0{index + 1} / 0{projects.length}
             </span>
-            <StatusBadge status={project.status} />
+            <StatusBadge done={project.done} />
           </div>
           <h3 className="mt-4 font-display text-[clamp(2.5rem,5vw,4.5rem)] leading-none font-semibold tracking-tight text-white">{project.title}</h3>
           <p className="mt-2 text-lg italic" style={{ color: project.accent }}>
             {project.tagline}
           </p>
-          <p className="mt-6 leading-relaxed text-soft">{project.description}</p>
-          <p className="eyebrow mt-8">Stack</p>
-          <TechList tech={project.tech} className="mt-4" />
+
+          <CaseBlock label={t.projects.problem} accent={project.accent}>
+            <p>{project.problem}</p>
+          </CaseBlock>
+          <CaseBlock label={t.projects.built} accent={project.accent}>
+            <ul className="space-y-2">
+              {project.built.map((b) => (
+                <li key={b} className="flex gap-3">
+                  <span className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full" style={{ background: project.accent }} />
+                  {b}
+                </li>
+              ))}
+            </ul>
+          </CaseBlock>
+          {project.result && (
+            <CaseBlock label={t.projects.result} accent={project.accent}>
+              <p>{project.result}</p>
+            </CaseBlock>
+          )}
+          {!!project.gallery?.length && (
+            <CaseBlock label={t.projects.gallery} accent={project.accent}>
+              <div className="flex gap-3">
+                {project.gallery.map((g) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={g.src} src={asset(g.src)} alt={g.alt} loading="lazy" className="h-64 w-auto rounded-2xl border border-white/10 object-contain" />
+                ))}
+              </div>
+            </CaseBlock>
+          )}
+          <CaseBlock label={t.projects.stack} accent={project.accent}>
+            <TechList tech={project.tech} />
+          </CaseBlock>
         </div>
       </motion.div>
 
@@ -344,13 +397,13 @@ function ProjectModal({ opened, onClose, onSwitch }: { opened: Opened; onClose: 
         animate={{ opacity: 1, y: 0, transition: { delay: 0.35 } }}
         exit={{ opacity: 0 }}
       >
-        <button onClick={() => onSwitch(prev)} className="rounded-full border border-white/15 bg-ink/60 px-4 py-2.5 font-mono text-xs text-soft backdrop-blur transition-colors hover:border-white/40 hover:text-white">
+        <button onClick={() => onSwitch(prev.id)} className="rounded-full border border-white/15 bg-ink/60 px-4 py-2.5 font-mono text-xs text-soft backdrop-blur transition-colors hover:border-white/40 hover:text-white">
           ← {prev.title}
         </button>
         <button onClick={onClose} autoFocus className="rounded-full bg-white px-5 py-2.5 font-mono text-xs font-medium text-ink">
-          Fechar <span className="hidden sm:inline">(Esc)</span>
+          {t.projects.close} <span className="hidden sm:inline">(Esc)</span>
         </button>
-        <button onClick={() => onSwitch(next)} className="rounded-full border border-white/15 bg-ink/60 px-4 py-2.5 font-mono text-xs text-soft backdrop-blur transition-colors hover:border-white/40 hover:text-white">
+        <button onClick={() => onSwitch(next.id)} className="rounded-full border border-white/15 bg-ink/60 px-4 py-2.5 font-mono text-xs text-soft backdrop-blur transition-colors hover:border-white/40 hover:text-white">
           {next.title} →
         </button>
       </motion.div>
@@ -361,6 +414,7 @@ function ProjectModal({ opened, onClose, onSwitch }: { opened: Opened; onClose: 
 /* ------------------------------------------------------------------ secção */
 
 export default function Projects() {
+  const { projects } = useContent();
   const [pinned, setPinned] = useState(false);
   const [opened, setOpened] = useState<Opened | null>(null);
 
@@ -377,30 +431,32 @@ export default function Projects() {
     };
   }, []);
 
-  const onOpen: OpenFn = (project, el) => setOpened({ project, from: el.getBoundingClientRect() });
-  const onSwitch = (p: Project) => setOpened((o) => o && { ...o, project: p });
+  const onOpen: OpenFn = (project, el) => setOpened({ id: project.id, from: el.getBoundingClientRect() });
+  const onSwitch = (id: string) => setOpened((o) => o && { ...o, id });
 
   // Ao fechar, o mockup regressa ao cartão do projeto que está aberto nesse momento
   const close = () => {
     setOpened((o) => {
-      const el = o && document.querySelector<HTMLElement>(`[data-visual="${o.project.id}"]`);
+      const el = o && document.querySelector<HTMLElement>(`[data-visual="${o.id}"]`);
       return o && el ? { ...o, from: el.getBoundingClientRect() } : o;
     });
     requestAnimationFrame(() => setOpened(null));
   };
   const closeRef = useRef(close);
   closeRef.current = close;
+  const ids = projects.map((p) => p.id).join(",");
 
   // Com o detalhe aberto: pára o scroll e aceita Esc / setas
-  const openId = opened?.project.id;
+  const openId = opened?.id;
   useEffect(() => {
     if (!openId) return;
     if (scroller.lenis) scroller.lenis.stop();
     else document.body.style.overflow = "hidden";
+    const list = ids.split(",");
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeRef.current();
       const step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-      if (step) setOpened((o) => o && { ...o, project: wrap(projects.indexOf(o.project) + step) });
+      if (step) setOpened((o) => o && { ...o, id: list[(list.indexOf(o.id) + step + list.length) % list.length] });
     };
     addEventListener("keydown", onKey);
     return () => {
@@ -408,7 +464,7 @@ export default function Projects() {
       if (scroller.lenis) scroller.lenis.start();
       else document.body.style.overflow = "";
     };
-  }, [openId]);
+  }, [openId, ids]);
 
   return (
     <section id="projetos" className="relative">

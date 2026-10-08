@@ -2,12 +2,35 @@
 
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useEffect, useState } from "react";
-import { nav } from "@/lib/data";
+import { useContent, useLang } from "@/lib/i18n";
 import { elastic, scroller, snappy } from "@/lib/motion";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
+/* Botão PT/EN: a pílula desliza para a língua ativa. */
+function LangToggle({ className = "" }: { className?: string }) {
+  const { lang, setLang } = useLang();
+  const { t } = useContent();
+  return (
+    <button
+      type="button"
+      onClick={() => setLang(lang === "pt" ? "en" : "pt")}
+      aria-label={t.nav.switchLang}
+      data-cursor="magnet"
+      className={`relative flex items-center rounded-full border border-white/15 p-1 font-mono text-[0.68rem] uppercase tracking-[0.12em] ${className}`}
+    >
+      {(["pt", "en"] as const).map((l) => (
+        <span key={l} className={`relative z-10 px-2.5 py-1 transition-colors duration-300 ${lang === l ? "text-ink" : "text-mute"}`}>
+          {lang === l && <motion.span layoutId="lang-pill" className="absolute inset-0 -z-10 rounded-full bg-white" transition={snappy} />}
+          {l}
+        </span>
+      ))}
+    </button>
+  );
+}
+
 export default function Nav() {
+  const { nav, t } = useContent();
   const [active, setActive] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -47,7 +70,7 @@ export default function Nav() {
             scrolled && !open ? "glass !bg-ink/75 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.8)]" : "border border-transparent"
           }`}
         >
-          <a href="#topo" data-cursor="magnet" onClick={() => setOpen(false)} className="group flex items-center gap-3" aria-label="Início">
+          <a href="#topo" data-cursor="magnet" onClick={() => setOpen(false)} className="group flex items-center gap-3" aria-label={t.nav.home}>
             <span className="grid h-9 w-9 place-items-center rounded-full border border-white/15 font-display text-sm font-semibold text-white transition-colors duration-300 group-hover:border-cyan/70">
               <span>
                 L<span className="text-cyan">M</span>
@@ -56,7 +79,7 @@ export default function Nav() {
             <span className="hidden font-display text-sm font-semibold tracking-tight text-white sm:block">Leonardo Martins</span>
           </a>
 
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Principal">
+          <nav className="hidden items-center gap-1 md:flex" aria-label={t.nav.main}>
             {nav.map((n) => (
               <a key={n.id} href={`#${n.id}`} data-cursor="magnet" className="relative rounded-full px-4 py-2 text-sm text-mute transition-colors duration-300 hover:text-white">
                 {active === n.id && (
@@ -71,15 +94,18 @@ export default function Nav() {
             ))}
           </nav>
 
-          <button
-            onClick={() => setOpen((o) => !o)}
-            className="grid h-10 w-10 place-items-center rounded-full border border-white/15 md:hidden"
-            aria-label={open ? "Fechar menu" : "Abrir menu"}
-            aria-expanded={open}
-          >
-            <span className={`absolute h-px w-4 bg-white transition-transform duration-300 ${open ? "rotate-45" : "-translate-y-[3px]"}`} />
-            <span className={`absolute h-px w-4 bg-white transition-transform duration-300 ${open ? "-rotate-45" : "translate-y-[3px]"}`} />
-          </button>
+          <div className="flex items-center gap-2">
+            <LangToggle />
+            <button
+              onClick={() => setOpen((o) => !o)}
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/15 md:hidden"
+              aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
+              aria-expanded={open}
+            >
+              <span className={`absolute h-px w-4 bg-white transition-transform duration-300 ${open ? "rotate-45" : "-translate-y-[3px]"}`} />
+              <span className={`absolute h-px w-4 bg-white transition-transform duration-300 ${open ? "-rotate-45" : "translate-y-[3px]"}`} />
+            </button>
+          </div>
         </div>
       </div>
 

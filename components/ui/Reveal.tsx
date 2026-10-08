@@ -48,6 +48,19 @@ const line: Variants = {
 };
 
 export function MaskText({ lines, className = "", as: Tag = "h2", inView = true }: { lines: ReactNode[]; className?: string; as?: "h1" | "h2" | "h3"; inView?: boolean }) {
+  // Acima da dobra (Hero): animação em CSS, que corre assim que a página pinta, sem esperar pelo JavaScript (melhor LCP)
+  if (!inView)
+    return (
+      <Tag className={className}>
+        {lines.map((l, i) => (
+          <span key={i} className="-mb-[0.14em] block overflow-hidden pb-[0.14em]">
+            <span className="mask-line block origin-left" style={{ animationDelay: `${0.1 + i * 0.1}s` }}>
+              {l}
+            </span>
+          </span>
+        ))}
+      </Tag>
+    );
   const MotionTag = motion[Tag];
   return (
     <MotionTag className={className} initial="hidden" {...(inView ? { whileInView: "show", viewport } : { animate: "show" })}>

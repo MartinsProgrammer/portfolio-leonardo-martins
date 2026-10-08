@@ -2,20 +2,22 @@
 
 import { motion } from "framer-motion";
 import { asset } from "@/lib/data";
+import { useContent } from "@/lib/i18n";
 
 /* Ilustrações próprias para cada projeto, com camadas em profundidade (translateZ) para o efeito 3D do tilt. */
 
 const depth = (z: number) => ({ transform: `translateZ(${z}px)` });
 
 export function NexoVisual() {
-  const chips = ["Alunos", "Aulas", "Exames", "Pagamentos"];
+  const { visuals } = useContent().t;
+  const chips = visuals.nexoChips;
   return (
     <div className="relative h-full w-full overflow-hidden bg-[radial-gradient(ellipse_at_30%_20%,#0f3b3a_0%,#07100f_60%)]" style={{ transformStyle: "preserve-3d" }}>
       <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(95,245,217,0.15)_1px,transparent_1px),linear-gradient(90deg,rgba(95,245,217,0.15)_1px,transparent_1px)] [background-size:28px_28px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
-      <Mockup src="/images/nexo-mockup.webp" alt="Painéis da plataforma NEXO para a escola, instrutores e alunos" z={50} />
+      <Mockup src="/images/nexo-mockup.webp" alt={visuals.nexoAlt} z={50} />
       {chips.map((c, i) => (
         <motion.span
-          key={c}
+          key={i}
           className="absolute rounded-full border border-[#5ff5d9]/30 bg-[#07100f]/80 px-3 py-1 font-mono text-[0.62rem] uppercase tracking-[0.15em] text-[#b9fff1] backdrop-blur"
           style={{ ...depth(80), left: `${[6, 70, 8, 72][i]}%`, top: `${[6, 8, 88, 86][i]}%` }}
           animate={{ y: [0, -6, 0] }}
@@ -39,6 +41,7 @@ function Mockup({ src, alt, z = 40 }: { src: string; alt: string; z?: number }) 
 }
 
 export function NoraVisual() {
+  const { visuals } = useContent().t;
   return (
     <div className="relative h-full w-full overflow-hidden bg-[radial-gradient(ellipse_at_50%_30%,#3a1c40_0%,#0d0710_65%)]" style={{ transformStyle: "preserve-3d" }}>
       {[0, 1, 2].map((r) => (
@@ -49,16 +52,17 @@ export function NoraVisual() {
           transition={{ duration: 3, repeat: Infinity, delay: r, ease: "easeOut" }}
         />
       ))}
-      <Mockup src="/images/nora-mockup.webp" alt="Ecrãs da app NORA: login, alerta SOS silencioso e contactos de emergência" />
+      <Mockup src="/images/nora-mockup.webp" alt={visuals.noraAlt} />
     </div>
   );
 }
 
 export function CivilVisual() {
+  const { visuals } = useContent().t;
   return (
     <div className="relative h-full w-full overflow-hidden bg-[radial-gradient(ellipse_at_50%_25%,#3b1a06_0%,#0e0906_65%)]" style={{ transformStyle: "preserve-3d" }}>
       <div className="absolute inset-x-0 top-0 h-1.5 opacity-60 [background:repeating-linear-gradient(-45deg,#ff7a1a_0_10px,transparent_10px_20px)]" />
-      <Mockup src="/images/civilconnect-mockup.webp" alt="Ecrãs da app CivilConnect: abertura, menu principal e risco de incêndio" />
+      <Mockup src="/images/civilconnect-mockup.webp" alt={visuals.civilAlt} />
     </div>
   );
 }
